@@ -1,0 +1,40 @@
+from transformers import pipeline
+
+# Load a pre-trained text generation pipeline using the 'gpt2' model
+generator = pipeline('text-generation', model='gpt2')
+
+def generate_text(prompt, max_length=150, num_return_sequences=1, temperature=0.8):
+    """
+    Generates text based on the given prompt using the pre-trained GPT-2 model.
+
+    Args:
+        prompt (str): The starting text for the model to complete.
+        max_length (int): The maximum length of the generated text.
+        num_return_sequences (int): The number of different sequences to generate.
+        temperature (float): Controls the randomness of the generation (higher is more random).
+
+    Returns:
+        list: A list of generated text sequences.
+    """
+    generated_sequences = generator(
+        prompt,
+        max_length=max_length,
+        num_return_sequences=num_return_sequences,
+        temperature=temperature,
+        pad_token_id=generator.tokenizer.eos_token_id # Avoid warning
+    )
+    return [seq['generated_text'] for seq in generated_sequences]
+
+if __name__ == "__main__":
+    while True:
+        user_prompt = input("Enter a starting prompt (or type 'quit' to exit): ")
+        if user_prompt.lower() == 'quit':
+            break
+
+        generated_texts = generate_text(user_prompt)
+
+        print("\nGenerated Text:")
+        for i, text in enumerate(generated_texts):
+            print(f"--- Generation {i+1} ---")
+            print(text)
+        print("-" * 30)
